@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#FF6700">
+  <title>¿Qué harías vos?</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <main class="app">
+
+    <header class="header">
+      <div class="logo">¿?</div>
+      <span>¿QUÉ HARÍAS VOS?</span>
+    </header>
+
+    <!-- INICIO -->
+    <section id="home" class="screen home">
+      <div class="home-label">UNA EXPERIENCIA INTERACTIVA</div>
+
+      <h1>
+        Tus decisiones.<br>
+        <span>Tu historia.</span>
+      </h1>
+
+      <p>
+        La vida está llena de decisiones.
+        ¿Qué harías vos cuando llegue el momento de elegir?
+      </p>
+
+      <div class="info">
+        <div>⏱ 10 segundos para decidir</div>
+        <div>⚡ Diferentes caminos</div>
+        <div>❤️ Una historia que depende de vos</div>
+      </div>
+
+      <button class="main-button" onclick="startGame()">
+        COMENZAR <span>→</span>
+      </button>
+    </section>
+
+    <!-- JUEGO -->
+    <section id="game" class="screen hidden">
+
+      <div class="game-top">
+        <span id="chapter">SITUACIÓN 01</span>
+        <button class="restart" onclick="restartGame()">↻</button>
+      </div>
+
+      <div class="progress">
+        <div id="progress"></div>
+      </div>
+
+      <div class="timer-container">
+        <div>
+          <small>TIEMPO PARA DECIDIR</small>
+          <div class="timer">
+            <span id="timer">10</span>
+            <small>SEGUNDOS</small>
+          </div>
+        </div>
+
+        <div class="timer-circle">
+          <div id="timer-bar"></div>
+        </div>
+      </div>
+
+      <div class="scenario">
+        <span id="category" class="category">EN LA ESCUELA</span>
+
+        <h2 id="title"></h2>
+
+        <p id="description"></p>
+
+        <div class="question">¿QUÉ HARÍAS VOS?</div>
+
+        <div id="options" class="options"></div>
+      </div>
+
+      <div id="timeout" class="timeout hidden">
+        ¡Se terminó el tiempo! Intentá nuevamente.
+      </div>
+
+    </section>
+
+    <!-- RESULTADO -->
+    <section id="result" class="screen hidden">
+
+      <div class="result-label">TU HISTORIA TERMINÓ</div>
+
+      <div id="result-icon" class="result-icon">🔥</div>
+
+      <h1 id="result-title"></h1>
+
+      <p id="result-description"></p>
+
+      <div class="reflection">
+        <span>💭</span>
+        <div>
+          <strong>PARA REFLEXIONAR</strong>
+          <p id="reflection-text"></p>
+        </div>
+      </div>
+
+      <div class="verse">
+        <p id="verse-text"></p>
+      </div>
+
+      <button class="main-button" onclick="startGame()">
+        VOLVER A JUGAR <span>→</span>
+      </button>
+
+      <button class="history-button" onclick="toggleHistory()">
+        VER MIS DECISIONES
+      </button>
+
+      <div id="history" class="history hidden">
+        <h3>Tu recorrido</h3>
+        <ol id="history-list"></ol>
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
