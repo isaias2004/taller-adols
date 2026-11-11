@@ -18,23 +18,20 @@
     </header>
 
     <!-- INICIO -->
-    <section id="home" class="screen home">
+    <section id="home" class="screen">
       <div class="home-label">UNA EXPERIENCIA INTERACTIVA</div>
 
-      <h1>
-        Tus decisiones.<br>
-        <span>Tu historia.</span>
-      </h1>
+      <h1>Tus decisiones.<br><span>Su historia.</span></h1>
 
       <p>
-        La vida está llena de decisiones.
-        ¿Qué harías vos cuando llegue el momento de elegir?
+        Mateo tiene 15 años y acaba de llegar a una escuela nueva.
+        Lo que decidas hoy puede cambiar su historia.
       </p>
 
       <div class="info">
         <div>⏱ 10 segundos para decidir</div>
-        <div>⚡ Diferentes caminos</div>
-        <div>❤️ Una historia que depende de vos</div>
+        <div>⚡ 3 situaciones, una sola historia</div>
+        <div>❤️ Cada decisión tiene consecuencias</div>
       </div>
 
       <button class="main-button" onclick="startGame()">
@@ -47,7 +44,7 @@
 
       <div class="game-top">
         <span id="chapter">SITUACIÓN 01</span>
-        <button class="restart" onclick="restartGame()">↻</button>
+        <button class="restart" onclick="restartGame()" aria-label="Volver al inicio">↻</button>
       </div>
 
       <div class="progress">
@@ -69,27 +66,118 @@
       </div>
 
       <div class="scenario">
-        <span id="category" class="category">EN LA ESCUELA</span>
-
+        <span id="category" class="category"></span>
         <h2 id="title"></h2>
-
         <p id="description"></p>
 
-        <div class="question">¿QUÉ HARÍAS VOS?</div>
+        <div id="consequence" class="consequence hidden"></div>
 
+        <div class="question">¿QUÉ HARÍAS VOS?</div>
         <div id="options" class="options"></div>
       </div>
 
       <div id="timeout" class="timeout hidden">
-        ¡Se terminó el tiempo! Intentá nuevamente.
+        ¡Se terminó el tiempo! Tenés que volver a empezar.
       </div>
 
     </section>
 
-    <!-- RESULTADO -->
+    <!-- PIZARRA -->
+    <section id="board" class="screen hidden">
+
+      <div class="result-label">EL RECORRIDO DE MATEO</div>
+
+      <h1>La historia que <span>construyeron</span></h1>
+
+      <p class="board-intro">
+        Estas son las decisiones que tomaron y las consecuencias que dejaron.
+        Lean juntos lo que pasó antes de elegir el final.
+      </p>
+
+      <div class="board-columns">
+        <div class="board-heading">
+          <span>LO QUE MATEO HIZO</span>
+          <span>LO QUE LE PASÓ</span>
+          <span>QUIÉN SE DIO CUENTA</span>
+        </div>
+
+        <div id="board-rows"></div>
+      </div>
+
+      <div class="board-question">
+        <strong>Ahora pensemos juntos:</strong>
+        <p>
+          Después de todo lo que pasó, ¿cómo creen que se siente Mateo?
+          ¿Qué debería hacer ahora?
+        </p>
+      </div>
+
+      <button class="main-button" onclick="showFinalChoices()">
+        ELEGIR EL FINAL <span>→</span>
+      </button>
+
+    </section>
+
+    <!-- ELECCIÓN DEL FINAL -->
+    <section id="final-choice" class="screen hidden">
+
+      <div class="result-label">EL DESENLACE</div>
+
+      <h1>¿Cómo termina <span>la historia?</span></h1>
+
+      <p class="board-intro">
+        No hay puntos ni respuestas automáticas. Lean los dos finales y,
+        entre todos, decidan cuál refleja mejor las decisiones de Mateo.
+      </p>
+
+      <div class="ending-card">
+        <div class="ending-number">FINAL 01</div>
+        <div class="ending-icon">🔄</div>
+        <h2>El que se anima a volver</h2>
+        <p>
+          Mateo se da cuenta de que, por querer encajar, empezó a perderse
+          a sí mismo. Piensa en lo que hizo y decide escribirle a Lauti
+          para pedirle perdón.
+        </p>
+        <p>
+          No todo se soluciona de un día para el otro. Quizás Lauti todavía
+          esté dolido y recuperar su confianza lleve tiempo. Pero Mateo
+          decide empezar de nuevo, reconocer sus errores y hacer lo correcto.
+        </p>
+        <button class="ending-button" onclick="selectEnding('volver')">
+          ELEGIR ESTE FINAL
+        </button>
+      </div>
+
+      <div class="ending-card">
+        <div class="ending-number">FINAL 02</div>
+        <div class="ending-icon">🦁</div>
+        <h2>El que se mantiene firme</h2>
+        <p>
+          Mateo entiende que hacer lo correcto no siempre significa ser
+          aceptado por todos. Aunque el grupo lo dejó de lado, sabe que
+          no necesita fingir para tener valor.
+        </p>
+        <p>
+          Lauti se acerca y empieza a hablar con él. Mateo descubre que
+          ser valiente no significa no tener miedo, sino actuar con miedo
+          cuando sabemos que algo es correcto.
+        </p>
+        <button class="ending-button" onclick="selectEnding('firme')">
+          ELEGIR ESTE FINAL
+        </button>
+      </div>
+
+      <button class="history-button" onclick="showScreen('board')">
+        ← VOLVER A LA PIZARRA
+      </button>
+
+    </section>
+
+    <!-- RESULTADO FINAL -->
     <section id="result" class="screen hidden">
 
-      <div class="result-label">TU HISTORIA TERMINÓ</div>
+      <div class="result-label">EL FINAL DE LA HISTORIA</div>
 
       <div id="result-icon" class="result-icon">🔥</div>
 
@@ -109,18 +197,13 @@
         <p id="verse-text"></p>
       </div>
 
-      <button class="main-button" onclick="startGame()">
+      <button class="main-button" onclick="restartGame()">
         VOLVER A JUGAR <span>→</span>
       </button>
 
-      <button class="history-button" onclick="toggleHistory()">
-        VER MIS DECISIONES
+      <button class="history-button" onclick="showScreen('board')">
+        VER LA HISTORIA COMPLETA
       </button>
-
-      <div id="history" class="history hidden">
-        <h3>Tu recorrido</h3>
-        <ol id="history-list"></ol>
-      </div>
 
     </section>
 

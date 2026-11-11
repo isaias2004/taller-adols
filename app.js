@@ -1,165 +1,122 @@
 
+// ==========================================
+// ¿QUÉ HARÍAS VOS? - APP.JS
+// Historia de Mateo
+// ==========================================
+
 const TOTAL_TIME = 10;
 
 let timeLeft = TOTAL_TIME;
 let timerInterval = null;
 let locked = false;
-let decisions = [];
-let currentScene = "inicio";
+let currentScene = 1;
+let history = [];
 
-const scenes = {
-  inicio: {
+// ==========================================
+// DATOS DE LA HISTORIA
+// ==========================================
+
+const story = {
+  1: {
     chapter: "SITUACIÓN 01",
     category: "EN LA ESCUELA",
-    title: "Una situación incómoda",
-    description: "Estás en la escuela y ves que un grupo de chicos se está burlando de un compañero. Lo insultan, se ríen de él y lo dejan de lado. ¿Qué harías?",
+    title: "La prueba",
+    description: "Mateo tiene 15 años y es nuevo en la escuela. Está haciendo una prueba importante. De repente, Santi, uno de los chicos populares del curso, le pasa una hoja con las respuestas y le dice: «Copiá, nadie se va a dar cuenta». ¿Qué debería hacer Mateo?",
     options: [
-      { text: "Me acerco al compañero y lo acompaño.", next: "acompanar" },
-      { text: "Hablo con un adulto para pedir ayuda.", next: "adulto" },
-      { text: "No me meto y sigo con lo mío.", next: "silencio" }
+      {
+        text: "Aceptar la hoja y copiar las respuestas.",
+        consequence: "Mateo aprueba la prueba, pero se siente mal porque sabe que no fue honesto. Santi descubre que Mateo está dispuesto a hacer lo que le dicen para encajar.",
+        action: "Aceptó copiar",
+        happened: "Aprobó, pero se sintió mal por no ser honesto.",
+        noticed: "Santi descubrió que Mateo cede ante la presión.",
+        data: { copied: true }
+      },
+      {
+        text: "Devolver la hoja y hacer la prueba por su cuenta.",
+        consequence: "Mateo se saca una nota baja, pero se queda tranquilo porque fue honesto. Lauti, un chico callado del fondo, ve lo que pasó y lo respeta.",
+        action: "Decidió no copiar",
+        happened: "Se sacó una nota baja, pero estuvo tranquilo.",
+        noticed: "Lauti vio su decisión y lo respetó.",
+        data: { copied: false }
+      }
     ]
   },
 
-  acompanar: {
+  2: {
     chapter: "SITUACIÓN 02",
-    category: "TU DECISIÓN",
-    title: "No está solo",
-    description: "Te acercás a tu compañero y te cuenta que esto viene pasando hace varios días y que ya no quiere ir a la escuela. ¿Qué hacés ahora?",
+    category: "EN EL RECREO",
+    title: "El recreo",
+    description: "Llegó el recreo. Un grupo de chicos empieza a burlarse de Lauti. Le hacen comentarios sobre su forma de vestir y todos se ríen.",
     options: [
-      { text: "Lo escucho y le digo que puede contar conmigo.", next: "acompanarAyuda" },
-      { text: "Le digo que tiene que defenderse solo.", next: "acompanarEscucha" }
+      {
+        text: "Reírme con el grupo para no quedar afuera.",
+        action: "Se rió de Lauti",
+        happened: "Lauti se sintió humillado y decepcionado.",
+        noticed: "Lauti se dio cuenta de que Mateo también lo lastimó.",
+        consequence: "Lauti mira a Mateo con decepción. Si antes lo respetaba, ahora siente que Mateo eligió al grupo antes que hacer lo correcto.",
+        data: { laughed: true }
+      },
+      {
+        text: "Defender a Lauti y pedir que dejen de molestarlo.",
+        action: "Defendió a Lauti",
+        happened: "El grupo también empezó a burlarse de Mateo.",
+        noticed: "Santi se dio cuenta y ahora lo ve como alguien que no sigue al grupo.",
+        consequence: "Mateo defiende a Lauti. El grupo se ríe de él también. Lauti agradece que alguien lo haya defendido, pero Santi empieza a verlo como un problema.",
+        data: { defended: true }
+      }
     ]
   },
 
-  acompanarAyuda: {
+  3: {
     chapter: "SITUACIÓN 03",
-    category: "UNA NUEVA DECISIÓN",
-    title: "Dar un paso más",
-    description: "Tu compañero se siente acompañado, pero la situación continúa. Sabés que necesita que alguien intervenga. ¿Qué harías?",
+    category: "A LA SALIDA",
+    title: "La fiesta",
+    description: "Es viernes. A la salida, Santi invita a Mateo a una fiesta. Van a estar todos los chicos del grupo. Mateo sabe que puede ser una oportunidad para encajar, pero también tiene muchas cosas dando vueltas en la cabeza. ¿Qué debería hacer?",
     options: [
-      { text: "Lo acompaño a hablar con un docente.", next: "finalValiente" },
-      { text: "Le prometo guardar el secreto.", next: "finalAprendizaje" }
+      {
+        text: "Ir a la fiesta para estar con todos.",
+        action: "Decidió ir a la fiesta",
+        happened: "Estuvo rodeado de gente, pero no necesariamente se sintió acompañado.",
+        noticed: "Santi vio que Mateo seguía buscando la aceptación del grupo.",
+        consequence: "Mateo va a la fiesta. Está rodeado de personas, pero se siente solo. Se pregunta si realmente está siendo él mismo o si solamente intenta agradar a los demás.",
+        data: { wentParty: true }
+      },
+      {
+        text: "No ir y quedarse tranquilo con su decisión.",
+        action: "Decidió no ir a la fiesta",
+        happened: "Se quedó solo en su casa, pero pudo estar en paz con su decisión.",
+        noticed: "Mateo empezó a reconocer qué cosas realmente quería hacer.",
+        consequence: "Mateo decide no ir. Quizás se queda solo esa noche, pero siente que no necesita fingir para ser aceptado. Empieza a pensar qué clase de persona quiere ser.",
+        data: { wentParty: false }
+      }
     ]
-  },
-
-  acompanarEscucha: {
-    chapter: "SITUACIÓN 03",
-    category: "UNA NUEVA DECISIÓN",
-    title: "¿Qué necesita escuchar?",
-    description: "Tu compañero se queda en silencio y parece sentirse peor. ¿Cómo reaccionás?",
-    options: [
-      { text: "Le pido disculpas y lo escucho.", next: "finalFuerte" },
-      { text: "Me voy porque no sé qué decir.", next: "finalAprendizaje" }
-    ]
-  },
-
-  adulto: {
-    chapter: "SITUACIÓN 02",
-    category: "TU DECISIÓN",
-    title: "Buscar ayuda",
-    description: "Decidís hablar con una persona adulta de confianza. Te escucha, pero te pregunta si estás seguro de lo que viste. ¿Qué hacés?",
-    options: [
-      { text: "Le cuento con sinceridad lo que pasó.", next: "adultoHablar" },
-      { text: "Me arrepiento y prefiero no decir nada.", next: "adultoReserva" }
-    ]
-  },
-
-  adultoHablar: {
-    chapter: "SITUACIÓN 03",
-    category: "UNA NUEVA DECISIÓN",
-    title: "Hacer lo correcto",
-    description: "El adulto decide intervenir. Algunos compañeros podrían molestarse con vos por haber hablado. ¿Qué hacés?",
-    options: [
-      { text: "Mantengo mi decisión porque hice lo correcto.", next: "finalValiente" },
-      { text: "Me alejo para evitar problemas.", next: "finalFuerte" }
-    ]
-  },
-
-  adultoReserva: {
-    chapter: "SITUACIÓN 03",
-    category: "UNA NUEVA DECISIÓN",
-    title: "El silencio también decide",
-    description: "Al no contar lo que pasó, la situación continúa. Te preguntás si podrías haber hecho algo diferente. ¿Qué harías?",
-    options: [
-      { text: "Busco a otro adulto de confianza.", next: "finalAprendizaje" },
-      { text: "Decido no involucrarme.", next: "finalTriste" }
-    ]
-  },
-
-  silencio: {
-    chapter: "SITUACIÓN 02",
-    category: "TU DECISIÓN",
-    title: "Mirar hacia otro lado",
-    description: "Seguís con tu día, pero al otro día volvés a ver la misma situación. Tu compañero está cada vez más aislado. ¿Qué hacés?",
-    options: [
-      { text: "Me acerco y trato de ayudarlo.", next: "silencioAcercar" },
-      { text: "Pienso que no es mi problema.", next: "silencioAlejar" }
-    ]
-  },
-
-  silencioAcercar: {
-    chapter: "SITUACIÓN 03",
-    category: "UNA NUEVA DECISIÓN",
-    title: "Todavía estás a tiempo",
-    description: "Decidís acercarte. Tu compañero se sorprende, pero agradece que alguien se preocupe por él. ¿Cómo seguís?",
-    options: [
-      { text: "Lo acompaño y busco ayuda si hace falta.", next: "finalValiente" },
-      { text: "Le digo que todo va a estar bien y me voy.", next: "finalAprendizaje" }
-    ]
-  },
-
-  silencioAlejar: {
-    chapter: "SITUACIÓN 03",
-    category: "UNA NUEVA DECISIÓN",
-    title: "Una oportunidad para pensar",
-    description: "La situación continúa y te das cuenta de que tu silencio también tuvo consecuencias. ¿Qué decidís hacer?",
-    options: [
-      { text: "Reconozco que puedo cambiar mi actitud.", next: "finalAprendizaje" },
-      { text: "Sigo sin involucrarme.", next: "finalTriste" }
-    ]
-  }
-};
-
-const endings = {
-  finalValiente: {
-    icon: "🔥",
-    title: "¡Sos un adolescente valiente!",
-    description: "Elegiste actuar con amor y hacer lo correcto, incluso cuando podía ser difícil. Ser valiente no significa no tener miedo, sino decidir hacer lo correcto a pesar de él.",
-    reflection: "Dios nos llama a ser valientes y a no quedarnos indiferentes frente a la injusticia.",
-    verse: "«Mirá que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo».",
-    reference: "Josué 1:9"
-  },
-
-  finalFuerte: {
-    icon: "💪",
-    title: "¡Sos un adolescente fuerte!",
-    description: "Elegiste enfrentar una situación complicada. La verdadera fortaleza también está en reconocer cuándo necesitamos ayuda y seguir adelante.",
-    reflection: "Dios nos da fuerzas para enfrentar los desafíos y aprender de cada experiencia.",
-    verse: "«Todo lo puedo en Cristo que me fortalece».",
-    reference: "Filipenses 4:13"
-  },
-
-  finalTriste: {
-    icon: "💙",
-    title: "Siempre podés volver a intentarlo",
-    description: "Esta vez elegiste alejarte de la situación. Eso no significa que seas una mala persona. Todos podemos equivocarnos, aprender y elegir algo diferente la próxima vez.",
-    reflection: "Dios se preocupa por quienes sufren y nos invita a ser instrumentos de amor y compañía.",
-    verse: "«Cercano está Jehová a los quebrantados de corazón».",
-    reference: "Salmos 34:18"
-  },
-
-  finalAprendizaje: {
-    icon: "🌱",
-    title: "Sos un adolescente en crecimiento",
-    description: "Tus decisiones muestran que todavía hay cosas por aprender. Lo importante es reflexionar, reconocer nuestros errores y estar dispuestos a cambiar.",
-    reflection: "Escuchar, pensar antes de actuar y aprender de nuestros errores también forman parte de crecer en Cristo.",
-    verse: "«Todo hombre sea pronto para oír, tardo para hablar, tardo para airarse».",
-    reference: "Santiago 1:19"
   }
 };
 
 // ==========================================
-// FUNCIONES GENERALES
+// FINALES
+// ==========================================
+
+const endings = {
+  volver: {
+    icon: "🔄",
+    title: "El que se anima a volver",
+    description: "Mateo se da cuenta de que, por querer encajar, empezó a perderse a sí mismo. Piensa en lo que hizo y decide escribirle a Lauti para pedirle perdón. No todo se soluciona de un día para el otro. Quizás Lauti todavía esté dolido y recuperar su confianza lleve tiempo. Pero Mateo decide empezar de nuevo, reconocer sus errores y hacer lo correcto.",
+    reflection: "Equivocarse no significa que todo esté perdido. Dios nos invita a reconocer nuestros errores, arrepentirnos y cambiar de dirección. Siempre podemos dar un paso para volver a hacer lo correcto.",
+    verse: "«El que encubre sus pecados no prosperará; mas el que los confiesa y se aparta alcanzará misericordia». — Proverbios 28:13"
+  },
+
+  firme: {
+    icon: "🦁",
+    title: "El que se mantiene firme",
+    description: "Mateo entiende que hacer lo correcto no siempre significa ser aceptado por todos. Aunque el grupo lo dejó de lado, sabe que no necesita fingir para tener valor. Lauti se acerca y empieza a hablar con él. Mateo descubre que ser valiente no significa no tener miedo, sino actuar con miedo cuando sabemos que algo es correcto.",
+    reflection: "Dios nos llama a mantenernos firmes, incluso cuando hacer lo correcto resulta difícil. Nuestra identidad no depende de la aprobación de los demás.",
+    verse: "«Mirá que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo». — Josué 1:9"
+  }
+};
+
+// ==========================================
+// CAMBIAR PANTALLAS
 // ==========================================
 
 function showScreen(screenId) {
@@ -172,31 +129,37 @@ function showScreen(screenId) {
   if (screen) {
     screen.classList.remove("hidden");
   }
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+// ==========================================
+// INICIAR JUEGO
+// ==========================================
 
 function startGame() {
   clearInterval(timerInterval);
 
-  decisions = [];
+  history = [];
+  currentScene = 1;
   locked = false;
-  currentScene = "inicio";
 
   showScreen("game");
-  loadScene(currentScene);
+  loadScene(1);
 }
 
 // ==========================================
-// CARGAR ESCENARIO
+// CARGAR SITUACIÓN
 // ==========================================
 
-function loadScene(sceneId) {
+function loadScene(sceneNumber) {
   clearInterval(timerInterval);
 
-  const scene = scenes[sceneId];
+  const scene = story[sceneNumber];
 
   if (!scene) return;
 
-  currentScene = sceneId;
+  currentScene = sceneNumber;
   locked = false;
 
   document.getElementById("chapter").textContent = scene.chapter;
@@ -204,9 +167,24 @@ function loadScene(sceneId) {
   document.getElementById("title").textContent = scene.title;
   document.getElementById("description").textContent = scene.description;
 
-  const progress = document.getElementById("progress");
-  progress.style.width = Math.min(decisions.length * 30, 90) + "%";
+  // Mostrar consecuencias de las decisiones anteriores
+  const consequenceBox = document.getElementById("consequence");
 
+  if (sceneNumber > 1) {
+    const previous = history[sceneNumber - 2];
+
+    consequenceBox.textContent = previous.consequence;
+    consequenceBox.classList.remove("hidden");
+  } else {
+    consequenceBox.textContent = "";
+    consequenceBox.classList.add("hidden");
+  }
+
+  // Progreso: tres situaciones
+  document.getElementById("progress").style.width =
+    ((sceneNumber - 1) / 3 * 100) + "%";
+
+  // Crear opciones
   const optionsContainer = document.getElementById("options");
   optionsContainer.innerHTML = "";
 
@@ -216,13 +194,14 @@ function loadScene(sceneId) {
     button.className = "option-btn";
     button.textContent = option.text;
 
-    button.addEventListener("click", () => chooseOption(option));
+    button.addEventListener("click", () => {
+      chooseOption(option);
+    });
 
     optionsContainer.appendChild(button);
   });
 
-  const timeout = document.getElementById("timeout");
-  timeout.classList.add("hidden");
+  document.getElementById("timeout").classList.add("hidden");
 
   startTimer();
 }
@@ -263,8 +242,13 @@ function updateTimer() {
   }
 }
 
+// ==========================================
+// SE ACABÓ EL TIEMPO
+// ==========================================
+
 function timeExpired() {
   clearInterval(timerInterval);
+
   locked = true;
 
   document.getElementById("timeout").classList.remove("hidden");
@@ -279,7 +263,7 @@ function timeExpired() {
 }
 
 // ==========================================
-// ELEGIR OPCIÓN
+// ELEGIR UNA OPCIÓN
 // ==========================================
 
 function chooseOption(option) {
@@ -288,58 +272,94 @@ function chooseOption(option) {
   locked = true;
   clearInterval(timerInterval);
 
-  decisions.push({
+  // Registrar decisión y consecuencia
+  history.push({
     scene: currentScene,
-    answer: option.text
+    action: option.action,
+    happened: option.happened,
+    noticed: option.noticed,
+    consequence: option.consequence,
+    data: option.data
   });
 
-  if (endings[option.next]) {
-    showResult(option.next);
+  // Mostrar la siguiente situación
+  if (currentScene < 3) {
+    loadScene(currentScene + 1);
   } else {
-    loadScene(option.next);
+    showBoard();
   }
 }
 
 // ==========================================
-// RESULTADOS
+// CONSTRUIR LA PIZARRA
 // ==========================================
 
-function showResult(endingId) {
+function showBoard() {
   clearInterval(timerInterval);
 
+  const boardRows = document.getElementById("board-rows");
+  boardRows.innerHTML = "";
+
+  history.forEach((item, index) => {
+    const row = document.createElement("div");
+    row.className = "board-row";
+
+    const actionCell = document.createElement("div");
+    actionCell.className = "board-cell";
+
+    const actionTitle = document.createElement("strong");
+    actionTitle.textContent = "Situación " + (index + 1);
+
+    const actionText = document.createElement("span");
+    actionText.textContent = item.action;
+
+    actionCell.appendChild(actionTitle);
+    actionCell.appendChild(actionText);
+
+    const happenedCell = document.createElement("div");
+    happenedCell.className = "board-cell";
+    happenedCell.textContent = item.happened;
+
+    const noticedCell = document.createElement("div");
+    noticedCell.className = "board-cell";
+    noticedCell.textContent = item.noticed;
+
+    row.appendChild(actionCell);
+    row.appendChild(happenedCell);
+    row.appendChild(noticedCell);
+
+    boardRows.appendChild(row);
+  });
+
+  document.getElementById("progress").style.width = "100%";
+
+  showScreen("board");
+}
+
+// ==========================================
+// ELEGIR UNO DE LOS DOS FINALES
+// ==========================================
+
+function showFinalChoices() {
+  showScreen("final-choice");
+}
+
+// ==========================================
+// MOSTRAR FINAL ELEGIDO POR EL GRUPO
+// ==========================================
+
+function selectEnding(endingId) {
   const ending = endings[endingId];
 
   if (!ending) return;
-
-  document.getElementById("progress").style.width = "100%";
 
   document.getElementById("result-icon").textContent = ending.icon;
   document.getElementById("result-title").textContent = ending.title;
   document.getElementById("result-description").textContent = ending.description;
   document.getElementById("reflection-text").textContent = ending.reflection;
-  document.getElementById("verse-text").textContent =
-    ending.verse + " — " + ending.reference;
-
-  const historyList = document.getElementById("history-list");
-  historyList.innerHTML = "";
-
-  decisions.forEach((decision, index) => {
-    const item = document.createElement("li");
-    item.textContent = "Decisión " + (index + 1) + ": " + decision.answer;
-    historyList.appendChild(item);
-  });
-
-  document.getElementById("history").classList.add("hidden");
+  document.getElementById("verse-text").textContent = ending.verse;
 
   showScreen("result");
-}
-
-// ==========================================
-// HISTORIAL
-// ==========================================
-
-function toggleHistory() {
-  document.getElementById("history").classList.toggle("hidden");
 }
 
 // ==========================================
@@ -349,10 +369,10 @@ function toggleHistory() {
 function restartGame() {
   clearInterval(timerInterval);
 
+  history = [];
+  currentScene = 1;
   timeLeft = TOTAL_TIME;
-  decisions = [];
   locked = false;
-  currentScene = "inicio";
 
   updateTimer();
   showScreen("home");
@@ -364,10 +384,4 @@ function restartGame() {
 
 document.addEventListener("DOMContentLoaded", () => {
   showScreen("home");
-
-  const startButton = document.querySelector("#home .main-button");
-
-  if (startButton) {
-    startButton.addEventListener("click", startGame);
-  }
 });
