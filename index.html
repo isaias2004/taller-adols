@@ -4,211 +4,175 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#FF6700">
-  <title>¿Qué harías vos?</title>
+  <meta name="theme-color" content="#171717">
+  <title>Vivir Modo Valiente</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
   <main class="app">
-
     <header class="header">
-      <div class="logo">¿?</div>
-      <span>¿QUÉ HARÍAS VOS?</span>
+      <div class="brand">VIVIR MODO VALIENTE</div>
+      <div id="participantName" class="participant-name"></div>
     </header>
 
-    <!-- INICIO -->
-    <section id="home" class="screen">
-      <div class="home-label">UNA EXPERIENCIA INTERACTIVA</div>
-
-      <h1>Tus decisiones.<br><span>Su historia.</span></h1>
-
-      <p>
-        Mateo tiene 15 años y acaba de llegar a una escuela nueva.
-        Lo que decidas hoy puede cambiar su historia.
+    <section id="welcomeScreen" class="screen">
+      <div class="eyebrow">UNA HISTORIA. MUCHAS DECISIONES.</div>
+      <h1>¿Estás listo para <span>vivir modo valiente</span>?</h1>
+      <p class="lead">
+        Vas a ser el protagonista de una historia en la que tus decisiones
+        pueden cambiar vidas. Cada elección cuenta.
       </p>
 
-      <div class="info">
-        <div>⏱ 10 segundos para decidir</div>
-        <div>⚡ 3 situaciones, una sola historia</div>
-        <div>❤️ Cada decisión tiene consecuencias</div>
-      </div>
+      <form id="joinForm" class="panel">
+        <label for="displayName">¿Cómo te llamás?</label>
+        <input id="displayName" type="text" minlength="2" maxlength="30"
+          placeholder="Escribí tu nombre" autocomplete="given-name" required>
 
-      <button class="main-button" onclick="startGame()">
-        COMENZAR <span>→</span>
-      </button>
+        <label for="roomCode">Código de la actividad</label>
+        <input id="roomCode" type="text" value="VALIENTE2026" readonly>
+
+        <button id="joinButton" type="submit">INGRESAR A LA HISTORIA</button>
+        <p id="joinMessage" class="message"></p>
+      </form>
     </section>
 
-    <!-- JUEGO -->
-    <section id="game" class="screen hidden">
-
-      <div class="game-top">
-        <span id="chapter">SITUACIÓN 01</span>
-        <button class="restart" onclick="restartGame()" aria-label="Volver al inicio">↻</button>
-      </div>
-
-      <div class="progress">
-        <div id="progress"></div>
-      </div>
-
-      <div class="timer-container">
-        <div>
-          <small>TIEMPO PARA DECIDIR</small>
-          <div class="timer">
-            <span id="timer">10</span>
-            <small>SEGUNDOS</small>
-          </div>
-        </div>
-
-        <div class="timer-circle">
-          <div id="timer-bar"></div>
-        </div>
-      </div>
-
-      <div class="scenario">
-        <span id="category" class="category"></span>
-        <h2 id="title"></h2>
-        <p id="description"></p>
-
-        <div id="consequence" class="consequence hidden"></div>
-
-        <div class="question">¿QUÉ HARÍAS VOS?</div>
-        <div id="options" class="options"></div>
-      </div>
-
-      <div id="timeout" class="timeout hidden">
-        ¡Se terminó el tiempo! Tenés que volver a empezar.
-      </div>
-
-    </section>
-
-    <!-- PIZARRA -->
-    <section id="board" class="screen hidden">
-
-      <div class="result-label">EL RECORRIDO DE MATEO</div>
-
-      <h1>La historia que <span>construyeron</span></h1>
-
-      <p class="board-intro">
-        Estas son las decisiones que tomaron y las consecuencias que dejaron.
-        Lean juntos lo que pasó antes de elegir el final.
+    <section id="introScreen" class="screen hidden">
+      <div class="eyebrow">BIENVENIDO A LA HISTORIA</div>
+      <h1>Vos sos el protagonista.</h1>
+      <p class="lead">
+        Vas a encarnar a Tomás, un adolescente que tendrá que tomar decisiones
+        en diferentes situaciones de su vida.
       </p>
-
-      <div class="board-columns">
-        <div class="board-heading">
-          <span>LO QUE MATEO HIZO</span>
-          <span>LO QUE LE PASÓ</span>
-          <span>QUIÉN SE DIO CUENTA</span>
-        </div>
-
-        <div id="board-rows"></div>
-      </div>
-
-      <div class="board-question">
-        <strong>Ahora pensemos juntos:</strong>
-        <p>
-          Después de todo lo que pasó, ¿cómo creen que se siente Mateo?
-          ¿Qué debería hacer ahora?
-        </p>
-      </div>
-
-      <button class="main-button" onclick="showFinalChoices()">
-        ELEGIR EL FINAL <span>→</span>
-      </button>
-
+      <p class="story-copy">
+        Tomás es una representación de vos mismo o vos misma y de lo que Dios
+        puede hacer a través de tus decisiones.
+      </p>
+      <p class="story-copy">
+        En cada capítulo tendrás que elegir entre dos opciones. Tendrás
+        <strong>15 segundos</strong> para votar. La opción más elegida por todos
+        será la que avance en esta historia.
+      </p>
+      <p class="story-copy emphasis">
+        Recordá: pequeñas decisiones pueden hacer historia con Dios.
+      </p>
+      <button id="charactersButton">CONOZCAMOS A LOS PERSONAJES</button>
     </section>
 
-    <!-- ELECCIÓN DEL FINAL -->
-    <section id="final-choice" class="screen hidden">
+    <section id="charactersScreen" class="screen hidden">
+      <div class="eyebrow">LOS PERSONAJES</div>
+      <h1>Conocé la historia</h1>
+      <div class="character-list">
+        <article class="character-card">
+          <div class="character-avatar">T</div>
+          <div><h3>Tomás</h3><p>El protagonista. Sus decisiones cambiarán el rumbo de la historia.</p></div>
+        </article>
+        <article class="character-card">
+          <div class="character-avatar">M</div>
+          <div><h3>Mateo</h3><p>Un compañero que atraviesa situaciones difíciles y necesita ser escuchado.</p></div>
+        </article>
+        <article class="character-card">
+          <div class="character-avatar">B</div>
+          <div><h3>Benja</h3><p>Compañero de Tomás y parte del grupo de amigos.</p></div>
+        </article>
+        <article class="character-card">
+          <div class="character-avatar">G</div>
+          <div><h3>El grupo de amigos</h3><p>El entorno donde se desarrollan muchas de las decisiones.</p></div>
+        </article>
+      </div>
+      <button id="readyButton">COMENZAR HISTORIA</button>
+    </section>
 
-      <div class="result-label">EL DESENLACE</div>
+    <section id="waitingScreen" class="screen hidden">
+      <div class="waiting-icon">⌛</div>
+      <div class="eyebrow">YA ESTÁS ADENTRO</div>
+      <h1>¡Hola, <span id="waitingName"></span>!</h1>
+      <p class="lead">Tu participación está registrada.</p>
+      <div class="waiting-box">
+        <div class="pulse"></div>
+        <strong>Esperando al coordinador</strong>
+        <p>Cuando comience el primer capítulo, aparecerá automáticamente en tu pantalla.</p>
+      </div>
+    </section>
 
-      <h1>¿Cómo termina <span>la historia?</span></h1>
+    <section id="gameScreen" class="screen hidden">
+      <div class="chapter-label" id="chapterLabel">CAPÍTULO 1</div>
+      <h1 id="chapterTitle"></h1>
+      <div class="situation-box">
+        <div class="eyebrow">LA SITUACIÓN</div>
+        <p id="chapterSituation"></p>
+      </div>
 
-      <p class="board-intro">
-        No hay puntos ni respuestas automáticas. Lean los dos finales y,
-        entre todos, decidan cuál refleja mejor las decisiones de Mateo.
-      </p>
-
-      <div class="ending-card">
-        <div class="ending-number">FINAL 01</div>
-        <div class="ending-icon">🔄</div>
-        <h2>El que se anima a volver</h2>
-        <p>
-          Mateo se da cuenta de que, por querer encajar, empezó a perderse
-          a sí mismo. Piensa en lo que hizo y decide escribirle a Lauti
-          para pedirle perdón.
-        </p>
-        <p>
-          No todo se soluciona de un día para el otro. Quizás Lauti todavía
-          esté dolido y recuperar su confianza lleve tiempo. Pero Mateo
-          decide empezar de nuevo, reconocer sus errores y hacer lo correcto.
-        </p>
-        <button class="ending-button" onclick="selectEnding('volver')">
-          ELEGIR ESTE FINAL
+      <div id="votingArea" class="hidden">
+        <div class="timer-wrap">
+          <div class="timer" id="timer">15</div>
+          <p>SEGUNDOS PARA DECIDIR</p>
+        </div>
+        <p class="vote-instruction">¿Qué harías vos?</p>
+        <button id="optionA" class="vote-option">
+          <span class="option-letter">A</span>
+          <span id="optionAText"></span>
         </button>
-      </div>
-
-      <div class="ending-card">
-        <div class="ending-number">FINAL 02</div>
-        <div class="ending-icon">🦁</div>
-        <h2>El que se mantiene firme</h2>
-        <p>
-          Mateo entiende que hacer lo correcto no siempre significa ser
-          aceptado por todos. Aunque el grupo lo dejó de lado, sabe que
-          no necesita fingir para tener valor.
-        </p>
-        <p>
-          Lauti se acerca y empieza a hablar con él. Mateo descubre que
-          ser valiente no significa no tener miedo, sino actuar con miedo
-          cuando sabemos que algo es correcto.
-        </p>
-        <button class="ending-button" onclick="selectEnding('firme')">
-          ELEGIR ESTE FINAL
+        <button id="optionB" class="vote-option">
+          <span class="option-letter">B</span>
+          <span id="optionBText"></span>
         </button>
+        <p id="voteMessage" class="message">Podés cambiar tu voto mientras el tiempo siga corriendo.</p>
       </div>
 
-      <button class="history-button" onclick="showScreen('board')">
-        ← VOLVER A LA PIZARRA
-      </button>
-
+      <div id="waitingResults" class="waiting-box hidden">
+        <strong>¡Voto registrado!</strong>
+        <p>Esperá a que termine el tiempo para conocer qué decidió la mayoría.</p>
+      </div>
     </section>
 
-    <!-- RESULTADO FINAL -->
-    <section id="result" class="screen hidden">
+    <section id="consequenceScreen" class="screen hidden">
+      <div class="eyebrow" id="consequenceChapter">CONSECUENCIA</div>
+      <h1 id="consequenceTitle"></h1>
+      <div class="story-copy" id="consequenceText"></div>
+      <div class="waiting-box">
+        <strong>La historia continúa...</strong>
+        <p>Esperá a que el coordinador avance al próximo capítulo.</p>
+      </div>
+    </section>
 
-      <div class="result-label">EL FINAL DE LA HISTORIA</div>
+    <section id="finalScreen" class="screen hidden">
+      <div class="eyebrow">EL FINAL DE TU HISTORIA</div>
+      <h1 id="finalTitle"></h1>
+      <div class="story-copy" id="finalText"></div>
+      <div class="waiting-box">
+        <strong>Gracias por ser parte de esta historia.</strong>
+        <p>Esperá a que el coordinador habilite la encuesta.</p>
+      </div>
+    </section>
 
-      <div id="result-icon" class="result-icon">🔥</div>
-
-      <h1 id="result-title"></h1>
-
-      <p id="result-description"></p>
-
-      <div class="reflection">
-        <span>💭</span>
-        <div>
-          <strong>PARA REFLEXIONAR</strong>
-          <p id="reflection-text"></p>
+    <section id="surveyScreen" class="screen hidden">
+      <div class="eyebrow">TU OPINIÓN NOS IMPORTA</div>
+      <h1>¿Cómo viviste esta experiencia?</h1>
+      <p class="lead">Elegí una valoración del 1 al 5.</p>
+      <form id="surveyForm" class="panel">
+        <div class="rating-options">
+          <label><input type="radio" name="rating" value="1" required><span>1</span></label>
+          <label><input type="radio" name="rating" value="2"><span>2</span></label>
+          <label><input type="radio" name="rating" value="3"><span>3</span></label>
+          <label><input type="radio" name="rating" value="4"><span>4</span></label>
+          <label><input type="radio" name="rating" value="5"><span>5</span></label>
         </div>
-      </div>
-
-      <div class="verse">
-        <p id="verse-text"></p>
-      </div>
-
-      <button class="main-button" onclick="restartGame()">
-        VOLVER A JUGAR <span>→</span>
-      </button>
-
-      <button class="history-button" onclick="showScreen('board')">
-        VER LA HISTORIA COMPLETA
-      </button>
-
+        <label for="surveyComment">¿Querés contarnos algo más? (opcional)</label>
+        <textarea id="surveyComment" maxlength="1000" rows="4"
+          placeholder="Escribí tu comentario..."></textarea>
+        <button id="surveyButton" type="submit">ENVIAR RESPUESTA</button>
+        <p id="surveyMessage" class="message"></p>
+      </form>
     </section>
 
+    <section id="finishedScreen" class="screen hidden">
+      <div class="waiting-icon">♥</div>
+      <h1>¡Gracias por participar!</h1>
+      <p class="lead">Recordá: pequeñas decisiones pueden hacer historia con Dios.</p>
+    </section>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>

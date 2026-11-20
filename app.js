@@ -1,387 +1,421 @@
 
-// ==========================================
-// ¿QUÉ HARÍAS VOS? - APP.JS
-// Historia de Mateo
-// ==========================================
+const SUPABASE_URL = 'https://gukcxxqjmtfwtgmomsmw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_XMTtJvCl_yp95piX9uXQww_a8EwEJ7f';
+const ROOM_CODE = 'VALIENTE2026';
+const STORAGE_KEY = 'vmv_participant';
 
-const TOTAL_TIME = 10;
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-let timeLeft = TOTAL_TIME;
+const $ = (id) => document.getElementById(id);
+
+let participant = null;
+let room = null;
+let chapter = null;
+let roomChannel = null;
 let timerInterval = null;
-let locked = false;
-let currentScene = 1;
-let history = [];
-
-// ==========================================
-// DATOS DE LA HISTORIA
-// ==========================================
-
-const story = {
-  1: {
-    chapter: "SITUACIÓN 01",
-    category: "EN LA ESCUELA",
-    title: "La prueba",
-    description: "Mateo tiene 15 años y es nuevo en la escuela. Está haciendo una prueba importante. De repente, Santi, uno de los chicos populares del curso, le pasa una hoja con las respuestas y le dice: «Copiá, nadie se va a dar cuenta». ¿Qué debería hacer Mateo?",
-    options: [
-      {
-        text: "Aceptar la hoja y copiar las respuestas.",
-        consequence: "Mateo aprueba la prueba, pero se siente mal porque sabe que no fue honesto. Santi descubre que Mateo está dispuesto a hacer lo que le dicen para encajar.",
-        action: "Aceptó copiar",
-        happened: "Aprobó, pero se sintió mal por no ser honesto.",
-        noticed: "Santi descubrió que Mateo cede ante la presión.",
-        data: { copied: true }
-      },
-      {
-        text: "Devolver la hoja y hacer la prueba por su cuenta.",
-        consequence: "Mateo se saca una nota baja, pero se queda tranquilo porque fue honesto. Lauti, un chico callado del fondo, ve lo que pasó y lo respeta.",
-        action: "Decidió no copiar",
-        happened: "Se sacó una nota baja, pero estuvo tranquilo.",
-        noticed: "Lauti vio su decisión y lo respetó.",
-        data: { copied: false }
-      }
-    ]
-  },
-
-  2: {
-    chapter: "SITUACIÓN 02",
-    category: "EN EL RECREO",
-    title: "El recreo",
-    description: "Llegó el recreo. Un grupo de chicos empieza a burlarse de Lauti. Le hacen comentarios sobre su forma de vestir y todos se ríen.",
-    options: [
-      {
-        text: "Reírme con el grupo para no quedar afuera.",
-        action: "Se rió de Lauti",
-        happened: "Lauti se sintió humillado y decepcionado.",
-        noticed: "Lauti se dio cuenta de que Mateo también lo lastimó.",
-        consequence: "Lauti mira a Mateo con decepción. Si antes lo respetaba, ahora siente que Mateo eligió al grupo antes que hacer lo correcto.",
-        data: { laughed: true }
-      },
-      {
-        text: "Defender a Lauti y pedir que dejen de molestarlo.",
-        action: "Defendió a Lauti",
-        happened: "El grupo también empezó a burlarse de Mateo.",
-        noticed: "Santi se dio cuenta y ahora lo ve como alguien que no sigue al grupo.",
-        consequence: "Mateo defiende a Lauti. El grupo se ríe de él también. Lauti agradece que alguien lo haya defendido, pero Santi empieza a verlo como un problema.",
-        data: { defended: true }
-      }
-    ]
-  },
-
-  3: {
-    chapter: "SITUACIÓN 03",
-    category: "A LA SALIDA",
-    title: "La fiesta",
-    description: "Es viernes. A la salida, Santi invita a Mateo a una fiesta. Van a estar todos los chicos del grupo. Mateo sabe que puede ser una oportunidad para encajar, pero también tiene muchas cosas dando vueltas en la cabeza. ¿Qué debería hacer?",
-    options: [
-      {
-        text: "Ir a la fiesta para estar con todos.",
-        action: "Decidió ir a la fiesta",
-        happened: "Estuvo rodeado de gente, pero no necesariamente se sintió acompañado.",
-        noticed: "Santi vio que Mateo seguía buscando la aceptación del grupo.",
-        consequence: "Mateo va a la fiesta. Está rodeado de personas, pero se siente solo. Se pregunta si realmente está siendo él mismo o si solamente intenta agradar a los demás.",
-        data: { wentParty: true }
-      },
-      {
-        text: "No ir y quedarse tranquilo con su decisión.",
-        action: "Decidió no ir a la fiesta",
-        happened: "Se quedó solo en su casa, pero pudo estar en paz con su decisión.",
-        noticed: "Mateo empezó a reconocer qué cosas realmente quería hacer.",
-        consequence: "Mateo decide no ir. Quizás se queda solo esa noche, pero siente que no necesita fingir para ser aceptado. Empieza a pensar qué clase de persona quiere ser.",
-        data: { wentParty: false }
-      }
-    ]
-  }
-};
-
-// ==========================================
-// FINALES
-// ==========================================
-
-const endings = {
-  volver: {
-    icon: "🔄",
-    title: "El que se anima a volver",
-    description: "Mateo se da cuenta de que, por querer encajar, empezó a perderse a sí mismo. Piensa en lo que hizo y decide escribirle a Lauti para pedirle perdón. No todo se soluciona de un día para el otro. Quizás Lauti todavía esté dolido y recuperar su confianza lleve tiempo. Pero Mateo decide empezar de nuevo, reconocer sus errores y hacer lo correcto.",
-    reflection: "Equivocarse no significa que todo esté perdido. Dios nos invita a reconocer nuestros errores, arrepentirnos y cambiar de dirección. Siempre podemos dar un paso para volver a hacer lo correcto.",
-    verse: "«El que encubre sus pecados no prosperará; mas el que los confiesa y se aparta alcanzará misericordia». — Proverbios 28:13"
-  },
-
-  firme: {
-    icon: "🦁",
-    title: "El que se mantiene firme",
-    description: "Mateo entiende que hacer lo correcto no siempre significa ser aceptado por todos. Aunque el grupo lo dejó de lado, sabe que no necesita fingir para tener valor. Lauti se acerca y empieza a hablar con él. Mateo descubre que ser valiente no significa no tener miedo, sino actuar con miedo cuando sabemos que algo es correcto.",
-    reflection: "Dios nos llama a mantenernos firmes, incluso cuando hacer lo correcto resulta difícil. Nuestra identidad no depende de la aprobación de los demás.",
-    verse: "«Mirá que te mando que te esfuerces y seas valiente; no temas ni desmayes, porque Jehová tu Dios estará contigo». — Josué 1:9"
-  }
-};
-
-// ==========================================
-// CAMBIAR PANTALLAS
-// ==========================================
+let selectedVote = null;
+let voteLocked = false;
+let rendering = false;
+let renderPending = false;
 
 function showScreen(screenId) {
-  document.querySelectorAll(".screen").forEach(screen => {
-    screen.classList.add("hidden");
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.classList.add('hidden');
+  });
+  $(screenId).classList.remove('hidden');
+}
+
+function showMessage(element, text, isError = false) {
+  element.textContent = text;
+  element.classList.toggle('error', isError);
+}
+
+function setParticipantName(name) {
+  $('participantName').textContent = name ? `Hola, ${name}` : '';
+  $('waitingName').textContent = name || '';
+}
+
+async function ensureAuthenticated() {
+  const { data, error } = await db.auth.getSession();
+  if (error) throw error;
+
+  if (data.session) return data.session;
+
+  const { data: authData, error: authError } = await db.auth.signInAnonymously();
+  if (authError) throw authError;
+
+  return authData.session;
+}
+
+async function joinRoom(displayName) {
+  await ensureAuthenticated();
+
+  const { data, error } = await db.rpc('join_room', {
+    p_room_code: ROOM_CODE,
+    p_display_name: displayName
   });
 
-  const screen = document.getElementById(screenId);
+  if (error) throw error;
 
-  if (screen) {
-    screen.classList.remove("hidden");
-  }
+  participant = {
+    room_id: data.room_id,
+    participant_id: data.participant_id,
+    display_name: data.display_name
+  };
 
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(participant));
+  setParticipantName(participant.display_name);
 
-// ==========================================
-// INICIAR JUEGO
-// ==========================================
+  await loadRoom();
+  subscribeToRoom();
 
-function startGame() {
-  clearInterval(timerInterval);
-
-  history = [];
-  currentScene = 1;
-  locked = false;
-
-  showScreen("game");
-  loadScene(1);
-}
-
-// ==========================================
-// CARGAR SITUACIÓN
-// ==========================================
-
-function loadScene(sceneNumber) {
-  clearInterval(timerInterval);
-
-  const scene = story[sceneNumber];
-
-  if (!scene) return;
-
-  currentScene = sceneNumber;
-  locked = false;
-
-  document.getElementById("chapter").textContent = scene.chapter;
-  document.getElementById("category").textContent = scene.category;
-  document.getElementById("title").textContent = scene.title;
-  document.getElementById("description").textContent = scene.description;
-
-  // Mostrar consecuencias de las decisiones anteriores
-  const consequenceBox = document.getElementById("consequence");
-
-  if (sceneNumber > 1) {
-    const previous = history[sceneNumber - 2];
-
-    consequenceBox.textContent = previous.consequence;
-    consequenceBox.classList.remove("hidden");
+  if (room.status === 'lobby') {
+    showScreen('introScreen');
   } else {
-    consequenceBox.textContent = "";
-    consequenceBox.classList.add("hidden");
+    await renderRoom();
   }
-
-  // Progreso: tres situaciones
-  document.getElementById("progress").style.width =
-    ((sceneNumber - 1) / 3 * 100) + "%";
-
-  // Crear opciones
-  const optionsContainer = document.getElementById("options");
-  optionsContainer.innerHTML = "";
-
-  scene.options.forEach(option => {
-    const button = document.createElement("button");
-
-    button.className = "option-btn";
-    button.textContent = option.text;
-
-    button.addEventListener("click", () => {
-      chooseOption(option);
-    });
-
-    optionsContainer.appendChild(button);
-  });
-
-  document.getElementById("timeout").classList.add("hidden");
-
-  startTimer();
 }
 
-// ==========================================
-// TEMPORIZADOR
-// ==========================================
+async function restoreParticipant() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) return;
 
-function startTimer() {
-  clearInterval(timerInterval);
+  try {
+    const storedParticipant = JSON.parse(saved);
+    const { data } = await db.auth.getSession();
 
-  timeLeft = TOTAL_TIME;
-  updateTimer();
-
-  timerInterval = setInterval(() => {
-    if (locked) {
-      clearInterval(timerInterval);
+    if (!data.session) {
+      localStorage.removeItem(STORAGE_KEY);
       return;
     }
 
-    timeLeft--;
-    updateTimer();
+    participant = storedParticipant;
+    setParticipantName(participant.display_name);
 
-    if (timeLeft <= 0) {
+    await loadRoom();
+    subscribeToRoom();
+    await renderRoom();
+  } catch (error) {
+    console.error('No se pudo recuperar la participación:', error);
+    showScreen('welcomeScreen');
+  }
+}
+
+async function loadRoom() {
+  const { data, error } = await db
+    .from('rooms')
+    .select('*')
+    .eq('id', participant.room_id)
+    .single();
+
+  if (error) throw error;
+  room = data;
+}
+
+async function loadChapter(number) {
+  const { data, error } = await db
+    .from('chapters')
+    .select('*')
+    .eq('chapter_number', number)
+    .single();
+
+  if (error) throw error;
+  chapter = data;
+}
+
+
+function subscribeToRoom() {
+  if (roomChannel || !participant) return;
+
+  console.log('Conectando Realtime para la sala:', participant.room_id);
+
+  roomChannel = db
+    .channel(`participant-room-${participant.room_id}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'rooms',
+        filter: `id=eq.${participant.room_id}`
+      },
+      async (payload) => {
+        console.log('REALTIME: llegó una actualización:', payload);
+
+        room = { ...room, ...payload.new };
+
+        console.log('Nuevo estado de la sala:', room.status);
+
+        await renderRoom();
+      }
+    )
+    .subscribe((status, error) => {
+      console.log('Estado de conexión Realtime:', status);
+
+      if (error) {
+        console.error('Error de conexión Realtime:', error);
+      }
+    });
+}
+
+
+async function renderRoom() {
+  if (!room) return;
+
+  // Si ya está renderizando, dejamos pendiente
+  // una nueva actualización para procesarla después.
+  if (rendering) {
+    renderPending = true;
+    return;
+  }
+
+  rendering = true;
+
+  try {
+    if (timerInterval) {
       clearInterval(timerInterval);
-      timeExpired();
+      timerInterval = null;
     }
-  }, 1000);
+
+    if (room.status === 'lobby') {
+      showScreen('waitingScreen');
+    } else if (room.status === 'voting') {
+      await renderVoting();
+    } else if (room.status === 'results') {
+      await renderResults();
+    } else if (room.status === 'consequence') {
+      await renderConsequence();
+    } else if (room.status === 'final') {
+      await renderFinal();
+    } else if (room.status === 'survey') {
+      showScreen('surveyScreen');
+    } else if (room.status === 'finished') {
+      showScreen('finishedScreen');
+    }
+
+  } catch (error) {
+    console.error('Error al actualizar la sala:', error);
+    showScreen('waitingScreen');
+
+  } finally {
+    rendering = false;
+
+    // Si llegó una actualización mientras renderizábamos,
+    // volvemos a procesar la sala con su estado más reciente.
+    if (renderPending) {
+      renderPending = false;
+      Promise.resolve().then(() => renderRoom());
+    }
+  }
+}
+
+
+async function renderVoting() {
+  await loadChapter(room.current_chapter);
+
+  showScreen('gameScreen');
+
+  $('chapterLabel').textContent = `CAPÍTULO ${chapter.chapter_number}`;
+  $('chapterTitle').textContent = chapter.title;
+  $('chapterSituation').textContent = chapter.situation;
+  $('optionAText').textContent = chapter.option_a;
+  $('optionBText').textContent = chapter.option_b;
+
+  $('votingArea').classList.remove('hidden');
+  $('waitingResults').classList.add('hidden');
+
+  selectedVote = null;
+  voteLocked = false;
+
+  $('optionA').classList.remove('selected');
+  $('optionB').classList.remove('selected');
+  $('optionA').disabled = false;
+  $('optionB').disabled = false;
+
+  showMessage($('voteMessage'), 'Podés cambiar tu voto mientras el tiempo siga corriendo.');
+
+  updateTimer();
+  timerInterval = setInterval(updateTimer, 250);
 }
 
 function updateTimer() {
-  document.getElementById("timer").textContent = timeLeft;
+  if (!room || room.status !== 'voting') return;
 
-  const timerBar = document.getElementById("timer-bar");
+  const end = new Date(room.voting_ends_at).getTime();
+  const remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
 
-  if (timerBar) {
-    timerBar.style.width = (timeLeft / TOTAL_TIME * 100) + "%";
+  $('timer').textContent = remaining;
+
+  if (remaining <= 0) {
+    voteLocked = true;
+    $('optionA').disabled = true;
+    $('optionB').disabled = true;
+    showMessage($('voteMessage'), '¡Tiempo terminado! Esperando los resultados...');
+    clearInterval(timerInterval);
+    timerInterval = null;
   }
 }
 
-// ==========================================
-// SE ACABÓ EL TIEMPO
-// ==========================================
+async function castVote(choice) {
+  if (voteLocked || !room || room.status !== 'voting') return;
 
-function timeExpired() {
-  clearInterval(timerInterval);
-
-  locked = true;
-
-  document.getElementById("timeout").classList.remove("hidden");
-
-  document.querySelectorAll(".option-btn").forEach(button => {
-    button.disabled = true;
-  });
-
-  setTimeout(() => {
-    restartGame();
-  }, 1800);
-}
-
-// ==========================================
-// ELEGIR UNA OPCIÓN
-// ==========================================
-
-function chooseOption(option) {
-  if (locked) return;
-
-  locked = true;
-  clearInterval(timerInterval);
-
-  // Registrar decisión y consecuencia
-  history.push({
-    scene: currentScene,
-    action: option.action,
-    happened: option.happened,
-    noticed: option.noticed,
-    consequence: option.consequence,
-    data: option.data
-  });
-
-  // Mostrar la siguiente situación
-  if (currentScene < 3) {
-    loadScene(currentScene + 1);
-  } else {
-    showBoard();
+  const end = new Date(room.voting_ends_at).getTime();
+  if (Date.now() >= end) {
+    updateTimer();
+    return;
   }
-}
 
-// ==========================================
-// CONSTRUIR LA PIZARRA
-// ==========================================
+  selectedVote = choice;
 
-function showBoard() {
-  clearInterval(timerInterval);
+  $('optionA').classList.toggle('selected', choice === 'A');
+  $('optionB').classList.toggle('selected', choice === 'B');
 
-  const boardRows = document.getElementById("board-rows");
-  boardRows.innerHTML = "";
+  showMessage($('voteMessage'), 'Registrando tu voto...');
 
-  history.forEach((item, index) => {
-    const row = document.createElement("div");
-    row.className = "board-row";
-
-    const actionCell = document.createElement("div");
-    actionCell.className = "board-cell";
-
-    const actionTitle = document.createElement("strong");
-    actionTitle.textContent = "Situación " + (index + 1);
-
-    const actionText = document.createElement("span");
-    actionText.textContent = item.action;
-
-    actionCell.appendChild(actionTitle);
-    actionCell.appendChild(actionText);
-
-    const happenedCell = document.createElement("div");
-    happenedCell.className = "board-cell";
-    happenedCell.textContent = item.happened;
-
-    const noticedCell = document.createElement("div");
-    noticedCell.className = "board-cell";
-    noticedCell.textContent = item.noticed;
-
-    row.appendChild(actionCell);
-    row.appendChild(happenedCell);
-    row.appendChild(noticedCell);
-
-    boardRows.appendChild(row);
+  const { error } = await db.rpc('cast_vote', {
+    p_chapter_number: room.current_chapter,
+    p_choice: choice
   });
 
-  document.getElementById("progress").style.width = "100%";
+  if (error) {
+    showMessage($('voteMessage'), error.message, true);
+    return;
+  }
 
-  showScreen("board");
+  showMessage(
+    $('voteMessage'),
+    `Votaste la opción ${choice}. Podés cambiar tu elección antes de que termine el tiempo.`
+  );
 }
 
-// ==========================================
-// ELEGIR UNO DE LOS DOS FINALES
-// ==========================================
+async function renderResults() {
+  await loadChapter(room.current_chapter);
+  showScreen('gameScreen');
 
-function showFinalChoices() {
-  showScreen("final-choice");
+  $('chapterLabel').textContent = `CAPÍTULO ${chapter.chapter_number}`;
+  $('chapterTitle').textContent = chapter.title;
+  $('chapterSituation').textContent = chapter.situation;
+
+  $('votingArea').classList.add('hidden');
+  $('waitingResults').classList.remove('hidden');
+  $('waitingResults').innerHTML = '';
+
+  const title = document.createElement('strong');
+  title.textContent = '¡Votación cerrada!';
+
+  const description = document.createElement('p');
+  description.textContent = 'El coordinador está preparando el resultado y la consecuencia.';
+
+  $('waitingResults').append(title, description);
 }
 
-// ==========================================
-// MOSTRAR FINAL ELEGIDO POR EL GRUPO
-// ==========================================
+async function renderConsequence() {
+  await loadChapter(room.current_chapter);
+  showScreen('consequenceScreen');
 
-function selectEnding(endingId) {
-  const ending = endings[endingId];
+  const winner = room.winning_choice;
 
-  if (!ending) return;
+  $('consequenceChapter').textContent = `CONSECUENCIA · CAPÍTULO ${chapter.chapter_number}`;
+  $('consequenceTitle').textContent = winner === 'A'
+    ? 'La decisión del grupo'
+    : 'La decisión del grupo';
 
-  document.getElementById("result-icon").textContent = ending.icon;
-  document.getElementById("result-title").textContent = ending.title;
-  document.getElementById("result-description").textContent = ending.description;
-  document.getElementById("reflection-text").textContent = ending.reflection;
-  document.getElementById("verse-text").textContent = ending.verse;
-
-  showScreen("result");
+  $('consequenceText').textContent = winner === 'A'
+    ? chapter.consequence_a
+    : chapter.consequence_b;
 }
 
-// ==========================================
-// REINICIAR
-// ==========================================
+async function renderFinal() {
+  await loadChapter(7);
+  showScreen('finalScreen');
 
-function restartGame() {
-  clearInterval(timerInterval);
+  const winner = room.winning_choice;
 
-  history = [];
-  currentScene = 1;
-  timeLeft = TOTAL_TIME;
-  locked = false;
+  $('finalTitle').textContent = winner === 'A'
+    ? 'UNA VIDA TRANSFORMADA'
+    : 'MUCHAS VIDAS TRANSFORMADAS';
 
-  updateTimer();
-  showScreen("home");
+  $('finalText').textContent = winner === 'A'
+    ? chapter.consequence_a
+    : chapter.consequence_b;
 }
 
-// ==========================================
-// INICIALIZACIÓN
-// ==========================================
+$('joinForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
 
-document.addEventListener("DOMContentLoaded", () => {
-  showScreen("home");
+  const name = $('displayName').value.trim();
+  if (name.length < 2) {
+    showMessage($('joinMessage'), 'Ingresá un nombre de al menos 2 caracteres.', true);
+    return;
+  }
+
+  $('joinButton').disabled = true;
+  $('joinButton').textContent = 'INGRESANDO...';
+  showMessage($('joinMessage'), '');
+
+  try {
+    await joinRoom(name);
+  } catch (error) {
+    showMessage($('joinMessage'), error.message, true);
+  } finally {
+    $('joinButton').disabled = false;
+    $('joinButton').textContent = 'INGRESAR A LA HISTORIA';
+  }
 });
+
+$('charactersButton').addEventListener('click', () => {
+  showScreen('charactersScreen');
+});
+
+$('readyButton').addEventListener('click', () => {
+  showScreen('waitingScreen');
+});
+
+$('optionA').addEventListener('click', () => castVote('A'));
+$('optionB').addEventListener('click', () => castVote('B'));
+
+$('surveyForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+
+  const selected = document.querySelector('input[name="rating"]:checked');
+  if (!selected) {
+    showMessage($('surveyMessage'), 'Elegí una valoración para continuar.', true);
+    return;
+  }
+
+  $('surveyButton').disabled = true;
+  $('surveyButton').textContent = 'ENVIANDO...';
+
+  try {
+    const rating = Number(selected.value);
+    const comment = $('surveyComment').value.trim();
+
+    const { error } = await db.rpc('submit_survey', {
+      p_rating: rating,
+      p_comment: comment || null
+    });
+
+    if (error) throw error;
+
+    showScreen('finishedScreen');
+  } catch (error) {
+    showMessage($('surveyMessage'), error.message, true);
+  } finally {
+    $('surveyButton').disabled = false;
+    $('surveyButton').textContent = 'ENVIAR RESPUESTA';
+  }
+});
+
+async function startApp() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+
+  if (saved) {
+    await restoreParticipant();
+
+    if (participant) return;
+  }
+
+  showScreen('welcomeScreen');
+}
+
+startApp();
