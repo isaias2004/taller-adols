@@ -6,6 +6,33 @@ const STORAGE_KEY = 'vmv_participant';
 
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+let serverTimeOffset = 0;
+let serverClockSynced = false;
+
+async function syncServerClock() {
+  const requestStart = Date.now();
+
+  const { data, error } = await db.rpc('get_server_time');
+
+  const requestEnd = Date.now();
+
+  if (error) throw error;
+
+  const serverTime = new Date(data).getTime();
+  const browserMidpoint = (requestStart + requestEnd) / 2;
+
+  serverTimeOffset = serverTime - browserMidpoint;
+  serverClockSynced = true;
+
+  console.log('RELOJ SINCRONIZADO:', {
+    diferenciaSegundos: (serverTimeOffset / 1000).toFixed(2)
+  });
+}
+
+function getServerNow() {
+  return Date.now() + serverTimeOffset;
+}
+
 const $ = (id) => document.getElementById(id);
 
 let participant = null;
@@ -17,6 +44,7 @@ let selectedVote = null;
 let voteLocked = false;
 let rendering = false;
 let renderPending = false;
+let activeVotingKey = null;
 
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(screen => {
@@ -159,11 +187,10 @@ function subscribeToRoom() {
 }
 
 
+
 async function renderRoom() {
   if (!room) return;
 
-  // Si ya está renderizando, dejamos pendiente
-  // una nueva actualización para procesarla después.
   if (rendering) {
     renderPending = true;
     return;
@@ -172,9 +199,14 @@ async function renderRoom() {
   rendering = true;
 
   try {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
+    // Solo detenemos el temporizador cuando salimos de la votación.
+    if (room.status !== 'voting') {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      activeVotingKey = null;
     }
 
     if (room.status === 'lobby') {
@@ -200,8 +232,6 @@ async function renderRoom() {
   } finally {
     rendering = false;
 
-    // Si llegó una actualización mientras renderizábamos,
-    // volvemos a procesar la sala con su estado más reciente.
     if (renderPending) {
       renderPending = false;
       Promise.resolve().then(() => renderRoom());
@@ -210,8 +240,26 @@ async function renderRoom() {
 }
 
 
+
 async function renderVoting() {
+
+  if (!serverClockSynced) {
+  await syncServerClock();
+}
+  const votingKey = `${room.current_chapter}:${room.voting_ends_at}`;
+  const isNewVoting = activeVotingKey !== votingKey;
+
   await loadChapter(room.current_chapter);
+
+  // Evitamos dibujar una votación que ya terminó mientras cargábamos.
+  if (
+    !room ||
+    room.status !== 'voting' ||
+    `${room.current_chapter}:${room.voting_ends_at}` !== votingKey
+  ) {
+    return;
+  }
+  
 
   showScreen('gameScreen');
 
@@ -224,25 +272,39 @@ async function renderVoting() {
   $('votingArea').classList.remove('hidden');
   $('waitingResults').classList.add('hidden');
 
-  selectedVote = null;
-  voteLocked = false;
+  if (isNewVoting) {
+    activeVotingKey = votingKey;
+    selectedVote = null;
+    voteLocked = false;
 
-  $('optionA').classList.remove('selected');
-  $('optionB').classList.remove('selected');
-  $('optionA').disabled = false;
-  $('optionB').disabled = false;
+    $('optionA').classList.remove('selected');
+    $('optionB').classList.remove('selected');
 
-  showMessage($('voteMessage'), 'Podés cambiar tu voto mientras el tiempo siga corriendo.');
+    $('optionA').disabled = false;
+    $('optionB').disabled = false;
+
+    showMessage(
+      $('voteMessage'),
+      'Podés cambiar tu voto mientras el tiempo siga corriendo.'
+    );
+  }
 
   updateTimer();
-  timerInterval = setInterval(updateTimer, 250);
+
+  if (!timerInterval && !voteLocked) {
+    timerInterval = setInterval(updateTimer, 250);
+  }
 }
 
 function updateTimer() {
   if (!room || room.status !== 'voting') return;
 
   const end = new Date(room.voting_ends_at).getTime();
-  const remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+
+  const remaining = Math.max(
+    0,
+    Math.ceil((end - getServerNow()) / 1000)
+  );
 
   $('timer').textContent = remaining;
 
@@ -250,7 +312,12 @@ function updateTimer() {
     voteLocked = true;
     $('optionA').disabled = true;
     $('optionB').disabled = true;
-    showMessage($('voteMessage'), '¡Tiempo terminado! Esperando los resultados...');
+
+    showMessage(
+      $('voteMessage'),
+      '¡Tiempo terminado! Esperando los resultados...'
+    );
+
     clearInterval(timerInterval);
     timerInterval = null;
   }
@@ -260,7 +327,7 @@ async function castVote(choice) {
   if (voteLocked || !room || room.status !== 'voting') return;
 
   const end = new Date(room.voting_ends_at).getTime();
-  if (Date.now() >= end) {
+  if (getServerNow() >= end) {
     updateTimer();
     return;
   }
