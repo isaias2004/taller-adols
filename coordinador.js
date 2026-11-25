@@ -2,7 +2,7 @@
   const SUPABASE_URL = 'https://gukcxxqjmtfwtgmomsmw.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_XMTtJvCl_yp95piX9uXQww_a8EwEJ7f';
   const ROOM_CODE = 'VALIENTE2026';
-  const VOTING_SECONDS = 20;
+  const VOTING_SECONDS = 45;
 
   const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
