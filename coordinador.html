@@ -40,6 +40,8 @@
     }
     button.secondary { background: #393939; color: white; }
     button.choice { background: #454545; color: white; }
+    button.danger { background: #b42318; color: white; }
+    button.danger:hover { background: #d92d20; }
     button:disabled { opacity: .4; cursor: not-allowed; }
     .hidden { display: none !important; }
     .status {
@@ -56,6 +58,7 @@
     .error { color: #ff7777; }
     .topline { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
     .topline button { width: auto; margin: 0; padding: 10px 14px; }
+    .topline .header-actions { display: flex; flex-direction: column; gap: 8px; }
     .empty { padding: 18px 0; color: #aaa; }
     .countdown {
       margin: 16px 0;
@@ -116,8 +119,13 @@
             <h2 style="margin:0 0 8px">Sala de juego</h2>
             <span class="status" id="roomStatus">Conectando...</span>
           </div>
-          <button id="logoutButton" class="secondary" type="button">Cerrar sesión</button>
+
+          <div class="header-actions">
+            <button id="logoutButton" class="secondary" type="button">Cerrar sesión</button>
+            <button id="resetGameButton" class="danger" type="button">REINICIAR JUEGO</button>
+          </div>
         </div>
+
         <p class="muted">Código: <strong>VALIENTE2026</strong></p>
         <p class="muted">Participantes ingresados</p>
         <div style="font-size:38px;font-weight:bold" id="participantCount">—</div>

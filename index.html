@@ -15,6 +15,7 @@
       <div id="participantName" class="participant-name"></div>
     </header>
 
+    <!-- BIENVENIDA -->
     <section id="welcomeScreen" class="screen">
       <div class="eyebrow">UNA HISTORIA. MUCHAS DECISIONES.</div>
       <h1>¿Estás listo para <span>vivir modo valiente</span>?</h1>
@@ -36,57 +37,109 @@
       </form>
     </section>
 
+    <!-- INTRODUCCIÓN -->
     <section id="introScreen" class="screen hidden">
       <div class="eyebrow">BIENVENIDO A LA HISTORIA</div>
       <h1>Vos sos el protagonista.</h1>
-      <p class="lead">
-        Vas a encarnar a Tomás, un adolescente que tendrá que tomar decisiones
-        en diferentes situaciones de su vida.
-      </p>
-      <p class="story-copy">
-        Tomás es una representación de vos mismo o vos misma y de lo que Dios
-        puede hacer a través de tus decisiones.
-      </p>
-      <p class="story-copy">
-        En cada capítulo tendrás que elegir entre dos opciones. Tendrás
-        <strong>15 segundos</strong> para votar. La opción más elegida por todos
-        será la que avance en esta historia.
-      </p>
-      <p class="story-copy emphasis">
-        Recordá: pequeñas decisiones pueden hacer historia con Dios.
-      </p>
+
+      <div class="intro-card">
+        <p>
+          Vas a encarnar a Tomás, un adolescente que tendrá que tomar
+          decisiones en diferentes situaciones de su vida.
+        </p>
+        <p>
+          Tomás representa a alguien como vos. A través de sus decisiones,
+          vamos a descubrir cómo Dios puede usar nuestra vida para hacer
+          una diferencia.
+        </p>
+        <p>
+          En cada capítulo vas a tener que elegir entre dos opciones.
+          Tendrás <strong>45 segundos</strong> para votar y la opción más
+          elegida por todos será la que avance en la historia.
+        </p>
+        <p class="intro-highlight">
+          🔥 ¡Preparáte para elegir, animarte y marcar la diferencia!
+          <br>
+          🙌 ¡Dios puede hacer grandes cosas a través de pequeñas decisiones!
+        </p>
+      </div>
+
       <button id="charactersButton">CONOZCAMOS A LOS PERSONAJES</button>
     </section>
 
+    <!-- PERSONAJES -->
     <section id="charactersScreen" class="screen hidden">
-      <div class="eyebrow">LOS PERSONAJES</div>
-      <h1>Conocé la historia</h1>
+      <div class="eyebrow">ANTES DE COMENZAR...</div>
+      <h1 class="characters-heading">CONOCÉ A LOS PERSONAJES</h1>
+
+      <img
+        src="assets/portada/personajes.png"
+        class="scene-image"
+        alt="Presentación de los personajes de Vivir Modo Valiente"
+      >
+
       <div class="character-list">
+
         <article class="character-card">
-          <div class="character-avatar">T</div>
-          <div><h3>Tomás</h3><p>El protagonista. Sus decisiones cambiarán el rumbo de la historia.</p></div>
-        </article>
-        <article class="character-card">
-          <div class="character-avatar">M</div>
-          <div><h3>Mateo</h3><p>Un compañero que atraviesa situaciones difíciles y necesita ser escuchado.</p></div>
-        </article>
-        <article class="character-card">
-          <div class="character-avatar">B</div>
-          <div><h3>Benja</h3><p>Compañero de Tomás y parte del grupo de amigos.</p></div>
-        </article>
-        <article class="character-card">
-          <div class="character-avatar">G</div>
-          <div><h3>El grupo de amigos</h3><p>El entorno donde se desarrollan muchas de las decisiones.</p></div>
-        </article>
+  <img id="characterTomasImage" class="character-image hidden" alt="Tomás">
+  <div class="character-info">
+    <h3>Tomás</h3>
+    <p>
+      <img src="assets/portada/caratomas.png" alt="Tomás"
+        style="width: 42px; height: 42px; object-fit: cover; border-radius: 12px; vertical-align: middle; margin-right: 8px;">
+      Es el protagonista. Sus decisiones pueden cambiar el rumbo de esta historia.
+    </p>
+  </div>
+</article>
+
+<article class="character-card">
+  <img id="characterMateoImage" class="character-image hidden" alt="Mateo">
+  <div class="character-info">
+    <h3>Mateo</h3>
+    <p>
+      <img src="assets/portada/caramateo.png" alt="Mateo"
+        style="width: 42px; height: 42px; object-fit: cover; border-radius: 12px; vertical-align: middle; margin-right: 8px;">
+      Es un compañero que está pasando por momentos difíciles y necesita que alguien lo escuche.
+    </p>
+  </div>
+</article>
+
+<article class="character-card">
+  <img id="characterBenjaImage" class="character-image hidden" alt="Benja">
+  <div class="character-info">
+    <h3>Benja</h3>
+    <p>
+      <img src="assets/portada/carabenja.png" alt="Benja"
+        style="width: 42px; height: 42px; object-fit: cover; border-radius: 12px; vertical-align: middle; margin-right: 8px;">
+      Es compañero de Tomás y forma parte de su grupo de amigos.
+    </p>
+  </div>
+</article>
+
+<article class="character-card">
+  <img id="characterGroupImage" class="character-image hidden" alt="Grupo de amigos">
+  <div class="character-info">
+    <h3>El grupo de amigos</h3>
+    <p>
+      <img src="assets/portada/caraamigos.png" alt="Grupo de amigos"
+        style="width: 42px; height: 42px; object-fit: cover; border-radius: 12px; vertical-align: middle; margin-right: 8px;">
+      Son parte del entorno de Tomás y Mateo. Sus decisiones también influyen en la historia.
+    </p>
+  </div>
+</article>
+
       </div>
+
       <button id="readyButton">COMENZAR HISTORIA</button>
     </section>
 
+    <!-- ESPERA -->
     <section id="waitingScreen" class="screen hidden">
       <div class="waiting-icon">⌛</div>
       <div class="eyebrow">YA ESTÁS ADENTRO</div>
       <h1>¡Hola, <span id="waitingName"></span>!</h1>
       <p class="lead">Tu participación está registrada.</p>
+
       <div class="waiting-box">
         <div class="pulse"></div>
         <strong>Esperando al coordinador</strong>
@@ -94,9 +147,13 @@
       </div>
     </section>
 
+    <!-- CAPÍTULOS -->
     <section id="gameScreen" class="screen hidden">
       <div class="chapter-label" id="chapterLabel">CAPÍTULO 1</div>
       <h1 id="chapterTitle"></h1>
+
+      <img id="chapterImage" class="scene-image hidden" alt="Escena del capítulo">
+
       <div class="situation-box">
         <div class="eyebrow">LA SITUACIÓN</div>
         <p id="chapterSituation"></p>
@@ -104,19 +161,27 @@
 
       <div id="votingArea" class="hidden">
         <div class="timer-wrap">
-          <div class="timer" id="timer">15</div>
+          <div class="timer" id="timer">45</div>
           <p>SEGUNDOS PARA DECIDIR</p>
         </div>
+
         <p class="vote-instruction">¿Qué harías vos?</p>
-        <button id="optionA" class="vote-option">
-          <span class="option-letter">A</span>
-          <span id="optionAText"></span>
-        </button>
-        <button id="optionB" class="vote-option">
-          <span class="option-letter">B</span>
-          <span id="optionBText"></span>
-        </button>
-        <p id="voteMessage" class="message">Podés cambiar tu voto mientras el tiempo siga corriendo.</p>
+
+        <div class="vote-options">
+          <button id="optionA" class="vote-option">
+            <span class="option-letter">A</span>
+            <span id="optionAText"></span>
+          </button>
+
+          <button id="optionB" class="vote-option">
+            <span class="option-letter">B</span>
+            <span id="optionBText"></span>
+          </button>
+        </div>
+
+        <p id="voteMessage" class="message">
+          Podés cambiar tu voto mientras el tiempo siga corriendo.
+        </p>
       </div>
 
       <div id="waitingResults" class="waiting-box hidden">
@@ -125,30 +190,40 @@
       </div>
     </section>
 
+    <!-- CONSECUENCIA -->
     <section id="consequenceScreen" class="screen hidden">
       <div class="eyebrow" id="consequenceChapter">CONSECUENCIA</div>
       <h1 id="consequenceTitle"></h1>
       <div class="story-copy" id="consequenceText"></div>
+
       <div class="waiting-box">
         <strong>La historia continúa...</strong>
         <p>Esperá a que el coordinador avance al próximo capítulo.</p>
       </div>
     </section>
 
+    <!-- FINAL -->
     <section id="finalScreen" class="screen hidden">
       <div class="eyebrow">EL FINAL DE TU HISTORIA</div>
       <h1 id="finalTitle"></h1>
+
+      <img id="finalImage" class="scene-image hidden"
+        alt="Viví Modo Valiente">
+
       <div class="story-copy" id="finalText"></div>
+
       <div class="waiting-box">
         <strong>Gracias por ser parte de esta historia.</strong>
         <p>Esperá a que el coordinador habilite la encuesta.</p>
       </div>
     </section>
 
+    <!-- ENCUESTA -->
     <section id="surveyScreen" class="screen hidden">
       <div class="eyebrow">TU OPINIÓN NOS IMPORTA</div>
       <h1>¿Cómo viviste esta experiencia?</h1>
       <p class="lead">Elegí una valoración del 1 al 5.</p>
+
       <form id="surveyForm" class="panel">
         <div class="rating-options">
           <label><input type="radio" name="rating" value="1" required><span>1</span></label>
@@ -157,18 +232,21 @@
           <label><input type="radio" name="rating" value="4"><span>4</span></label>
           <label><input type="radio" name="rating" value="5"><span>5</span></label>
         </div>
-        <label for="surveyComment">¿Querés contarnos algo más? (opcional)</label>
-        <textarea id="surveyComment" maxlength="1000" rows="4"
-          placeholder="Escribí tu comentario..."></textarea>
+
         <button id="surveyButton" type="submit">ENVIAR RESPUESTA</button>
         <p id="surveyMessage" class="message"></p>
       </form>
     </section>
 
+    <!-- FINALIZADO -->
     <section id="finishedScreen" class="screen hidden">
+      <img id="finishedImage" class="scene-image hidden"
+          alt="Viví Modo Valiente">
       <div class="waiting-icon">♥</div>
       <h1>¡Gracias por participar!</h1>
-      <p class="lead">Recordá: pequeñas decisiones pueden hacer historia con Dios.</p>
+      <p class="lead">
+        🔥 Recordá: Dios puede hacer grandes cosas a través de tu vida.
+      </p>
     </section>
   </main>
 
